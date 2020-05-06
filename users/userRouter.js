@@ -1,6 +1,6 @@
 const express = require('express');
 const userDb = require('./userDb.js')
-const postDb = require('../posts/postDb')
+const postDb = require('../posts/postDb.js')
 
 const router = express.Router();
 
@@ -16,8 +16,21 @@ router.post('/', validateUser, (req, res) => {
 });
 
 //add a new post
-router.post('/:id/posts', (req, res) => {
-  // do your magic!
+router.post('/:id/posts', validateUserId, validatePost, (req, res) => {
+  
+  const newPost = {
+    user_id: parseInt(req.params.id),
+    text: req.body.text
+  }
+  
+  //
+  postDb.insert([newPost]).then(resource => {
+    res.status(201).json({message: "post successfully created", data: resource})
+  }).catch(error => {
+    
+    res.status(500).json({message: "error adding post to database", error: error})
+  })
+  
 });
 
 //get users
@@ -29,18 +42,22 @@ router.get('/', (req, res) => {
   })
 });
 
+//get user by id
 router.get('/:id', (req, res) => {
   // do your magic!
 });
 
+//get posts by user id
 router.get('/:id/posts', (req, res) => {
   // do your magic!
 });
 
+//delete a user by id
 router.delete('/:id', (req, res) => {
   // do your magic!
 });
 
+//edit a user by id
 router.put('/:id', (req, res) => {
   // do your magic!
 });
@@ -53,10 +70,10 @@ function validateUserId(req, res, next) {
   if(!req.headers.id) {
     res.status(400).json({message: "please include a user id in your header"})
   } else {
-    const id = req.headers.id
+    
     //check to see if it's in the database
 
-    userDb.getById(id).then(response => {
+    userDb.getById(req.headers.id).then(response => {
       if(response) {
         //if it's in the database then move on
         next();
@@ -64,7 +81,7 @@ function validateUserId(req, res, next) {
         //if it's not in the database, throw an error
         res.status(400).json({message: "invalid user id"})
       }
-      next()
+      
     }).catch(_ => {
       res.status(500).json({message: "error validating userID"})
     })
