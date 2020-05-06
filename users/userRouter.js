@@ -62,8 +62,12 @@ router.get('/:id/posts', validateUserId, (req, res) => {
 });
 
 //delete a user by id
-router.delete('/:id', (req, res) => {
-  // do your magic!
+router.delete('/:id', validateUserId, (req, res) => {
+  userDb.remove(req.params.id).then(response => {
+    res.status(200).json({message: "Succsesfully deleted record"})
+  }).catch(error => {
+    res.status(500).json({message: "error deleting user", error: error})
+  })
 });
 
 //edit a user by id
