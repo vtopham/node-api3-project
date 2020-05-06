@@ -31,8 +31,12 @@ router.delete('/:id', validatePostId, (req, res) => {
 });
 
 //edit post by id
-router.put('/:id', (req, res) => {
-  // do your magic!
+router.put('/:id', validatePostId, validatePost, (req, res) => {
+  postDb.update(req.params.id, req.body).then(updated => {
+    res.status(200).json({message: "The post was updated successfully"})
+  }).catch(error => {
+    res.status(500).json({message: "error updating post", error: error})
+  })
 });
 
 // custom middleware
@@ -45,6 +49,16 @@ function validatePostId(req, res, next) {
       res.status(400).json({message: "invalid post id"})
     }
   })
+}
+
+function validatePost(req, res, next) {
+  if(!req.body) {
+    res.status(400).json({message: "missing post data"})
+  } else if (!req.body.text) {
+    res.status(400).json({message: "missing required text field"})
+  } else {
+    next()
+  }
 }
 
 module.exports = router;
