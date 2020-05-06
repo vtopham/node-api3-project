@@ -19,7 +19,7 @@ router.post('/', validateUser, (req, res) => {
 router.post('/:id/posts', validateUserId, validatePost, (req, res) => {
   
   const newPost = {
-    user_id: parseInt(req.params.id),
+    user_id: req.user,
     text: req.body.text
   }
   
@@ -44,7 +44,7 @@ router.get('/', (req, res) => {
 
 //get user by id
 router.get('/:id', validateUserId, (req, res) => {
-  userDb.getById(req.params.id).then(user => {
+  userDb.getById(req.user).then(user => {
       //we are already validating that we will get back a user
       res.status(200).json({data: user})
   }).catch(_ => {
@@ -54,7 +54,8 @@ router.get('/:id', validateUserId, (req, res) => {
 
 //get posts by user id
 router.get('/:id/posts', validateUserId, (req, res) => {
-  postDb.getById(req.params.id).then(posts => {
+  userDb.getUserPosts(req.user).then(posts => {
+    //posts is coming back undefined here!
     res.status(200).json({data: posts})
   }).catch(error => {
     res.status(500).json({message: "error retrieving posts", error: error})
@@ -89,6 +90,7 @@ function validateUserId(req, res, next) {
 
     userDb.getById(req.params.id).then(response => {
       if(response) {
+        req.user = req.params.id;
         //if it's in the database then move on
         next();
       } else {
