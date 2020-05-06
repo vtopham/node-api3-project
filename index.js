@@ -2,28 +2,11 @@
 
 const server = require('./server.js')
 
-///USERS
-//get users
+const userRouter = require('./users/userRouter.js')
+const postRouter = require('./posts/postRouter.js')
 
-
-//add to users
-
-
-//delete a user
-
-
-//edit a user
-
-
-//POSTS
-
-//get posts by user
-
-//add a post
-
-//delete a post
-
-//edit a post
+server.use('/users',userRouter)
+server.use('/posts',postRouter)
 
 server.listen(4000, _ => {
     console.log("Listening on 4000")
