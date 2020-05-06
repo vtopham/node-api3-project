@@ -1,11 +1,13 @@
 const express = require('express');
+const userDb = require('./users/userDb')
 
 const server = express();
 
 server.use(express.json())
 
+
 server.use(logger)
-server.use(validateUserId("1"))
+server.use(validateUserId)
 
 server.get('/',(req, res) => {
   res.send(`<h2>Let's write some middleware!</h2>`);
@@ -20,20 +22,27 @@ function logger(req, res, next) {
 }
 
 //check the userid
-function validateUserId(userId) {
+function validateUserId(req, res, next) {
+ 
+  if(!req.headers.id) {
+    res.status(400).json({message: "please include a user id in your header"})
+  } else {
+    const id = req.headers.id
+    //check to see if it's in the database
 
-  return function(req, res, next) {
-    if(!req.headers.id) {
-      res.status(400).json({message: "please include a user id in your header"})
-    } else {
-      const id = req.headers.id
-      if (id === userId) {
+    userDb.getById(id).then(response => {
+      if(response) {
         next();
       } else {
         res.status(400).json({message: "invalid user id"})
       }
-    }
+      next()
+    }).catch(_ => {
+      res.status(500).json({message: "error validating userID"})
+    })
+
   }
+  
 
 }
 
@@ -49,7 +58,6 @@ function validateUser(req, res, next) {
 
 }
 
-
 //validates the body on a request to make a new post
 function validatePost(req, res, next) {
   if(!req.body) {
@@ -60,5 +68,7 @@ function validatePost(req, res, next) {
     next()
   }
 }
+
+
 
 module.exports = server;
