@@ -43,24 +43,22 @@ router.get('/', (req, res) => {
 });
 
 //get user by id
-router.get('/:id', (req, res) => {
-  // console.log(req.params.id)
+router.get('/:id', validateUserId, (req, res) => {
   userDb.getById(req.params.id).then(user => {
-    
-    if(user) {
+      //we are already validating that we will get back a user
       res.status(200).json({data: user})
-    } else {
-      res.status(404).json({message: "user not found"})
-    }
-    
   }).catch(_ => {
     res.status(500).json({message: "Error retrieving user"})
   })
 });
 
 //get posts by user id
-router.get('/:id/posts', (req, res) => {
-  // do your magic!
+router.get('/:id/posts', validateUserId, (req, res) => {
+  postDb.getById(req.params.id).then(posts => {
+    res.status(200).json({data: posts})
+  }).catch(error => {
+    res.status(500).json({message: "error retrieving posts", error: error})
+  })
 });
 
 //delete a user by id
@@ -78,13 +76,13 @@ router.put('/:id', (req, res) => {
 //run this when you want to validate that the userId in the header exists
 function validateUserId(req, res, next) {
   //validate that there's a header.id
-  if(!req.headers.id) {
+  if(!req.params.id) {
     res.status(400).json({message: "please include a user id in your header"})
   } else {
     
     //check to see if it's in the database
 
-    userDb.getById(req.headers.id).then(response => {
+    userDb.getById(req.params.id).then(response => {
       if(response) {
         //if it's in the database then move on
         next();
