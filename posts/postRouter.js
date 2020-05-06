@@ -22,8 +22,12 @@ router.get('/:id', validatePostId, (req, res) => {
 });
 
 //delete post by id
-router.delete('/:id', (req, res) => {
-  // do your magic!
+router.delete('/:id', validatePostId, (req, res) => {
+  postDb.remove(req.params.id).then(removed => {
+    res.status(200).json({message: "post was successfully removed"})
+  }).catch(error => {
+    res.status(500).json({message: "error deleting post", error: error})
+  })
 });
 
 //edit post by id
