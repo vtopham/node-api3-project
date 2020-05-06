@@ -14,7 +14,7 @@ router.get('/', (req, res) => {
 
 //get post by id
 router.get('/:id', validatePostId, (req, res) => {
-  postDb.getById(req.params.id).then(post => {
+  postDb.getById(req.post).then(post => {
     res.status(200).json({data: post})
   }).catch(error => {
     res.status(500).json({message: "error retrieving post", error: error})
@@ -23,7 +23,7 @@ router.get('/:id', validatePostId, (req, res) => {
 
 //delete post by id
 router.delete('/:id', validatePostId, (req, res) => {
-  postDb.remove(req.params.id).then(removed => {
+  postDb.remove(req.post).then(removed => {
     res.status(200).json({message: "post was successfully removed"})
   }).catch(error => {
     res.status(500).json({message: "error deleting post", error: error})
@@ -32,7 +32,7 @@ router.delete('/:id', validatePostId, (req, res) => {
 
 //edit post by id
 router.put('/:id', validatePostId, validatePost, (req, res) => {
-  postDb.update(req.params.id, req.body).then(updated => {
+  postDb.update(req.post, req.body).then(updated => {
     res.status(200).json({message: "The post was updated successfully"})
   }).catch(error => {
     res.status(500).json({message: "error updating post", error: error})
@@ -44,7 +44,8 @@ router.put('/:id', validatePostId, validatePost, (req, res) => {
 function validatePostId(req, res, next) {
   postDb.getById(req.params.id).then(resource => {
     if(resource) {
-      next()
+      req.post = req.params.id;
+      next();
     } else {
       res.status(400).json({message: "invalid post id"})
     }
