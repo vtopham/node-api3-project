@@ -71,8 +71,12 @@ router.delete('/:id', validateUserId, (req, res) => {
 });
 
 //edit a user by id
-router.put('/:id', (req, res) => {
-  // do your magic!
+router.put('/:id', validateUser, (req, res) => {
+  userDb.update(req.params.id, req.body).then(updated => {
+    res.status(200).json({message: "user updated successfully"})
+  }).catch(error => {
+    res.status(500).json({message: "error updating user", error: error})
+  })
 });
 
 //custom middleware
