@@ -13,8 +13,12 @@ router.get('/', (req, res) => {
 });
 
 //get post by id
-router.get('/:id', (req, res) => {
-  // do your magic!
+router.get('/:id', validatePostId, (req, res) => {
+  postDb.getById(req.params.id).then(post => {
+    res.status(200).json({data: post})
+  }).catch(error => {
+    res.status(500).json({message: "error retrieving post", error: error})
+  })
 });
 
 //delete post by id
