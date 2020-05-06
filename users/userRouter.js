@@ -70,8 +70,9 @@ router.delete('/:id', validateUserId, (req, res) => {
   })
 });
 
-//edit a user by id
-router.put('/:id', validateUser, (req, res) => {
+//edit a user by id TODO DOES NOT WORK
+router.put('/:id', validateUser, validateUserId, (req, res) => {
+  console.log(req.params.id, req.body)
   userDb.update(req.params.id, req.body).then(updated => {
     res.status(200).json({message: "user updated successfully"})
   }).catch(error => {
@@ -83,11 +84,7 @@ router.put('/:id', validateUser, (req, res) => {
 
 //run this when you want to validate that the userId in the header exists
 function validateUserId(req, res, next) {
-  //validate that there's a header.id
-  if(!req.params.id) {
-    res.status(400).json({message: "please include a user id in your header"})
-  } else {
-    
+ 
     //check to see if it's in the database
 
     userDb.getById(req.params.id).then(response => {
@@ -103,7 +100,7 @@ function validateUserId(req, res, next) {
       res.status(500).json({message: "error validating userID"})
     })
 
-  }
+  
   
 }
 

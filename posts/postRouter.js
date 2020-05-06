@@ -1,19 +1,28 @@
 const express = require('express');
+const postDb = require('./postDb.js')
 
 const router = express.Router();
 
+//get all posts
 router.get('/', (req, res) => {
-  // do your magic!
+  postDb.get().then(posts => {
+    res.status(200).json({data: posts})
+  }).catch(error => {
+    res.status(500).json({message: "error retrieving posts", error: error})
+  })
 });
 
+//get post by id
 router.get('/:id', (req, res) => {
   // do your magic!
 });
 
+//delete post by id
 router.delete('/:id', (req, res) => {
   // do your magic!
 });
 
+//edit post by id
 router.put('/:id', (req, res) => {
   // do your magic!
 });
@@ -21,7 +30,13 @@ router.put('/:id', (req, res) => {
 // custom middleware
 
 function validatePostId(req, res, next) {
-  // do your magic!
+  postDb.getById(req.params.id).then(resource => {
+    if(resource) {
+      next()
+    } else {
+      res.status(400).json({message: "invalid post id"})
+    }
+  })
 }
 
 module.exports = router;
