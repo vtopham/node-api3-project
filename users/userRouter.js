@@ -8,7 +8,11 @@ const router = express.Router();
 
 //add a new user
 router.post('/', validateUser, (req, res) => {
-  
+  userDb.insert(req.body).then(resource => {
+    res.status(201).json({message: "successfully created user", data: resource})
+  }).catch(error => {
+    res.status(500).json({message: "error storing new user", error: error})
+  })
 });
 
 //add a new post
