@@ -44,7 +44,18 @@ router.get('/', (req, res) => {
 
 //get user by id
 router.get('/:id', (req, res) => {
-  // do your magic!
+  // console.log(req.params.id)
+  userDb.getById(req.params.id).then(user => {
+    
+    if(user) {
+      res.status(200).json({data: user})
+    } else {
+      res.status(404).json({message: "user not found"})
+    }
+    
+  }).catch(_ => {
+    res.status(500).json({message: "Error retrieving user"})
+  })
 });
 
 //get posts by user id
