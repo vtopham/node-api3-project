@@ -1,3 +1,4 @@
+require('dotenv').config()
 const express = require('express');
 const userDb = require('./users/userDb')
 
@@ -9,7 +10,7 @@ server.use(express.json())
 server.use(logger)
 
 server.get('/',(req, res) => {
-  res.send(`<h2>Let's write some middleware!</h2>`);
+  res.send(`<h2>${process.env.GREETING}</h2>`);
 });
 
 //custom middleware
